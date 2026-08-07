@@ -136,7 +136,7 @@ def patient_shape_features(masks, pids):
     return rows
 
 # ---------------------------------------------------------------- data fetch
-DATA_URL = ""   # instructor: put a direct-download URL to lgg_128.npz here
+DATA_URL = "https://huggingface.co/datasets/dkucheruk/lgg-seminar/resolve/main/lgg_128.npz"
 
 def get_data(path="lgg_128.npz", url=None, allow_demo=True):
     """Return (images, masks, patient_ids, slice_index).
@@ -215,8 +215,7 @@ def make_demo_data(n_patients=40, size=128, seed=0):
             I.append(np.clip(img,0,255).astype(np.uint8)); M.append(mask); P.append(pid); S.append(s)
     return np.stack(I), np.stack(M), np.array(P), np.array(S, np.int16)
 
-META_URL = ""   # instructor: direct-download URL to the dataset's data.csv
-
+META_URL = "https://huggingface.co/datasets/dkucheruk/lgg-seminar/resolve/main/lgg_meta.csv"
 def get_meta(path="lgg_meta.csv", url=None):
     """Per-patient clinical/genomic table (the dataset's data.csv). For capstone track C."""
     import os, urllib.request, pandas as pd

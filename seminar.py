@@ -28,17 +28,21 @@ class SliceDataset(torch.utils.data.Dataset):
     def __init__(self, images, masks, indices, augment=False):
         self.x, self.y, self.idx, self.aug = images, masks, indices, augment
     def __len__(self): return len(self.idx)
+
     def __getitem__(self, i):
         j = self.idx[i]
-        img = self.x[j].astype(np.float32) / 255.0      # HWC
-        msk = self.y[j].astype(np.float32)              # HW
+        img = self.x[j].astype(np.float32) / 255.0  # HWC
+        msk = self.y[j].astype(np.float32)  # HW
         if self.aug:
-            if np.random.rand() < 0.5: img, msk = img[:, ::-1], msk[:, ::-1]
-            if np.random.rand() < 0.5: img, msk = img[::-1], msk[::-1]
-            k = np.random.randint(4)
-            if k: img, msk = np.rot90(img, k, (0, 1)), np.rot90(msk, k, (0, 1))
-        img = np.ascontiguousarray(img.transpose(2, 0, 1))   # CHW
-        msk = np.ascontiguousarray(msk)[None]                # 1HW
+            if np.random.rand() < 0.5:  # left-right mirror only
+                img, msk = img[:, ::-1], msk[:, ::-1]
+            if np.random.rand() < 0.5:  # small rotation, not 90 deg
+                from scipy.ndimage import rotate as ndrotate
+                a = np.random.uniform(-15, 15)
+                img = ndrotate(img, a, axes=(0, 1), reshape=False, order=1, mode="constant", cval=0)
+                msk = ndrotate(msk, a, axes=(0, 1), reshape=False, order=0, mode="constant", cval=0)
+        img = np.ascontiguousarray(img.transpose(2, 0, 1))
+        msk = np.ascontiguousarray(msk)[None]
         return torch.from_numpy(img), torch.from_numpy(msk)
 
 # ---------------------------------------------------------------- metric
